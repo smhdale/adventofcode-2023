@@ -1,0 +1,14 @@
+{
+  "name": "adventofcode-2023",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "day": "bun lib/run.ts $1"
+  },
+  "devDependencies": {
+    "bun-types": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
