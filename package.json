@@ -4,9 +4,11 @@
   "type": "module",
   "scripts": {
     "day": "bun bin/run.ts $1",
-    "init": "bun bin/init.ts $1"
+    "init": "bun bin/init.ts $1",
+    "check": "bunx @biomejs/biome check --apply ./bin ./days ./lib"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.4.1",
     "bun-types": "latest"
   },
   "peerDependencies": {

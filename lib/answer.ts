@@ -1,4 +1,4 @@
-import { getInput, getSample } from "./input"
+import { getInput, getSample } from './input'
 
 type AnswerFn = (input: string[]) => unknown | Promise<unknown>
 
