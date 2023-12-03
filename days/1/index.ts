@@ -1,4 +1,9 @@
 import { answer } from "../../lib/answer"
+import { sum } from "../../lib/math"
+
+/**
+ * Part 1
+ */
 
 function getFirstAndLastDigit(input: string) {
 	const digits = input.replace(/[^\d]/g, '')
@@ -13,44 +18,70 @@ function getCalibrationValues(input: string[]) {
 	})
 }
 
-/**
- * Part 1
- */
-
 await answer(1, (input) => {
 	const values = getCalibrationValues(input)
-	return values.reduce((acc, value) => acc + value, 0)
+	return sum(values)
 })
 
 /**
  * Part 2
  */
 
-function wordsToDigits(input: string): string {
-	const wordMap = [
-		['one', '1'],
-		['two', '2'],
-		['three', '3'],
-		['four', '4'],
-		['five', '5'],
-		['six', '6'],
-		['seven', '7'],
-		['eight', '8'],
-		['nine', '9'],
-	]
+const WORD_MAP = [
+	['one', '1'],
+	['two', '2'],
+	['three', '3'],
+	['four', '4'],
+	['five', '5'],
+	['six', '6'],
+	['seven', '7'],
+	['eight', '8'],
+	['nine', '9'],
+]
 
-	let output = input
-	for (const [word, num] of wordMap) {
-		while (output.includes(word)) {
-			output = output.replace(word, num)
+function identifyDigitAt(input: string, at: number): string | undefined {
+	const char = input.charAt(at)
+
+	// Check for numeric digit
+	if (/\d/.test(char)) {
+		return char
+	}
+
+	// Check for written digit
+	for (const [word, num] of WORD_MAP) {
+		if (input.substring(at, at + word.length) === word) {
+			return num
 		}
 	}
 
-	return output
+	return undefined
+}
+
+function firstDigit(input: string) {
+	for (let i = 0; i < input.length; i++) {
+		const digit = identifyDigitAt(input, i)
+		if (digit) return digit
+	}
+	throw new Error('No digit found.')
+}
+
+function lastDigit(input: string) {
+	for (let i = input.length - 1; i >= 0; i--) {
+		const digit = identifyDigitAt(input, i)
+		if (digit) return digit
+	}
+	throw new Error('No digit found.')
+}
+
+function getCalibrationValues2(input: string[]) {
+	return input.map((line) => {
+		const first = firstDigit(line)
+		const last = lastDigit(line)
+		return Number(`${first}${last}`)
+	})
 }
 
 await answer(2, (input) => {
-	const correctedInputs = input.map(wordsToDigits)
-	const values = getCalibrationValues(correctedInputs)
-	return values.reduce((acc, value) => acc + value, 0)
+	const values = getCalibrationValues2(input)
+	return sum(values)
 })

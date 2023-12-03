@@ -3,6 +3,7 @@ import { getInput, getSample } from "./input"
 type AnswerFn = (input: string[]) => unknown | Promise<unknown>
 
 export async function answer(part: 1 | 2, resolveAnswer: AnswerFn) {
+	Bun.env.PART = String(part)
 	console.log(`=== Part ${part} ===`)
 
 	const sampleInput = await getSample()
