@@ -1,5 +1,5 @@
-import { answer } from "../../lib/answer"
-import { sum } from "../../lib/math"
+import { answer } from '../../lib/answer'
+import { sum } from '../../lib/math'
 
 /**
  * Part 1

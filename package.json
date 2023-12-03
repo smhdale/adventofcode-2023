@@ -3,7 +3,8 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "day": "bun lib/run.ts $1"
+    "day": "bun bin/run.ts $1",
+    "init": "bun bin/init.ts $1"
   },
   "devDependencies": {
     "bun-types": "latest"
