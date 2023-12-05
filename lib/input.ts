@@ -26,3 +26,15 @@ export async function getInput(): Promise<string[]> {
 	const path = resolve(import.meta.dir, `../days/${day}/input.txt`)
 	return await readLines(path)
 }
+
+export function groupInput(input: string[]): string[][] {
+	const groups: string[][] = []
+	const group: string[] = []
+
+	for (const line of [...input, '']) {
+		if (line !== '') group.push(line)
+		else if (group.length > 0) groups.push(group.splice(0))
+	}
+
+	return groups
+}
