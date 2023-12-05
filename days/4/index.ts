@@ -51,9 +51,9 @@ await answer(2, (input) => {
 		const card = pool.shift()
 		if (card) {
 			// Win cards and add to pool
-			const matches = card.winningNumbers
-				.filter((number) => card.cardNumbers.includes(number))
-				.length
+			const matches = card.winningNumbers.filter((number) =>
+				card.cardNumbers.includes(number),
+			).length
 			pool.push(...cards.slice(card.id, card.id + matches))
 
 			// Move processed card to final array
