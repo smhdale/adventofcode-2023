@@ -13,12 +13,18 @@ class Card {
 
 	public get value(): number {
 		switch (this.symbol) {
-			case 'A': return 14
-			case 'K': return 13
-			case 'Q': return 12
-			case 'J': return 11
-			case 'T': return 10
-			default: return Number(this.symbol)
+			case 'A':
+				return 14
+			case 'K':
+				return 13
+			case 'Q':
+				return 12
+			case 'J':
+				return 11
+			case 'T':
+				return 10
+			default:
+				return Number(this.symbol)
 		}
 	}
 
@@ -26,7 +32,7 @@ class Card {
 		return this.value - other.value
 	}
 
-	public toString() {
+	public toString(): string {
 		return this.symbol
 	}
 }
@@ -41,30 +47,42 @@ enum HandType {
 	FiveOfAKind = 7,
 }
 
+type CardCount = {
+	symbol: string
+	count: number
+}
+
+type CreateCardFn = (symbol: string) => Card
+
 class Hand {
-	private counts: number[]
+	private counts: CardCount[]
 
 	public readonly bid: number
 	public readonly cards: Card[]
 
-	constructor(input: string) {
+	constructor(
+		input: string,
+		createCard: CreateCardFn = (symbol) => new Card(symbol),
+	) {
 		const [cards, bid] = input.split(' ')
 		this.bid = Number(bid)
+		this.cards = cards.split('').map(createCard)
+		this.counts = this.countCards()
+	}
 
-		this.cards = []
-		const counts = new Map<string, number>()
-
-		for (const symbol of cards.split('')) {
-			this.cards.push(new Card(symbol))
-			const count = counts.get(symbol) ?? 0
-			counts.set(symbol, count + 1)
+	protected countCards(): CardCount[] {
+		const counts: Map<string, number> = new Map()
+		for (const card of this.cards) {
+			const count = counts.get(card.symbol) ?? 0
+			counts.set(card.symbol, count + 1)
 		}
-
-		this.counts = Array.from(counts.values()).sort((a, b) => b - a)
+		return Array.from(counts.entries())
+			.map(([symbol, count]): CardCount => ({ symbol, count }))
+			.sort((a, b) => b.count - a.count)
 	}
 
 	public get type(): HandType {
-		const [a, b] = this.counts
+		const [a, b] = this.counts.map((count) => count.count)
 		if (a === 5) return HandType.FiveOfAKind
 		if (a === 4) return HandType.FourOfAKind
 		if (a === 3) {
@@ -93,7 +111,7 @@ class Hand {
 		return 0
 	}
 
-	public toString() {
+	public toString(): string {
 		const cards = this.cards.map((card) => card.toString()).join('')
 		return `${cards} (${this.type})`
 	}
@@ -105,7 +123,7 @@ function calculateWinnings(hands: Hand[]): number {
 	}, 0)
 }
 
-await answer(1, (input, meta) => {
+await answer(1, (input) => {
 	const hands = input.map((hand) => new Hand(hand))
 	hands.sort((a, b) => a.compare(b))
 	return calculateWinnings(hands)
@@ -115,6 +133,36 @@ await answer(1, (input, meta) => {
  * Part 2
  */
 
-await answer(2, (input) => {
+class CardOrJoker extends Card {
+	public get value(): number {
+		switch (this.symbol) {
+			case 'J':
+				return 1
+			default:
+				return super.value
+		}
+	}
+}
 
+class HandWithJokers extends Hand {
+	constructor(input: string) {
+		super(input, (symbol) => new CardOrJoker(symbol))
+	}
+
+	protected countCards(): CardCount[] {
+		const counts = super.countCards()
+		// Upgrade hands where J is not the most frequent count
+		const jokersIndex = counts.findIndex((count) => count.symbol === 'J')
+		if (jokersIndex >= 0 && counts[jokersIndex].count < 5) {
+			const [jokers] = counts.splice(jokersIndex, 1)
+			counts[0].count += jokers.count
+		}
+		return counts
+	}
+}
+
+await answer(2, (input) => {
+	const hands = input.map((hand) => new HandWithJokers(hand))
+	hands.sort((a, b) => a.compare(b))
+	return calculateWinnings(hands)
 })
