@@ -81,6 +81,45 @@ await answer(1, (input) => {
  * Part 2
  */
 
-await answer(2, (input) => {
+class Path {
+	private readonly map: NodeMap
+	private node: Node
 
+	constructor(map: NodeMap, startNodeId: string) {
+		this.map = map
+		const node = this.map.get(startNodeId)
+		if (!node) throw new Error(`Node ${startNodeId} not found`)
+		this.node = node
+	}
+
+	public get nodeId(): string {
+		return this.node.id
+	}
+
+	public step(direction: string) {
+		const node = this.node.get(direction)
+		if (!node) throw new Error(`Node ${this.nodeId} -> ${direction} not found`)
+		this.node = node
+	}
+
+	public atEndNode(): boolean {
+		return this.nodeId.endsWith('Z')
+	}
+}
+
+await answer(2, (input) => {
+	const { nav, map } = parseInput(input)
+
+	const paths = Array.from(map.keys())
+		.filter((key) => key.endsWith('A'))
+		.map((key) => new Path(map, key))
+
+	let step = 0
+	while (paths.some((path) => !path.atEndNode())) {
+		const dir = nav.next()
+		for (const path of paths) path.step(dir.value)
+		step++
+	}
+
+	return step
 })
