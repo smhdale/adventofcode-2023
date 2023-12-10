@@ -58,4 +58,26 @@ await answer(1, (input, meta) => {
  * Part 2
  */
 
-await answer(2, (input) => {})
+function backcast(sequence: number[]): number {
+	const diffStack = stackDifferences(sequence)
+	const deepest = diffStack.length - 1
+
+	for (let i = deepest; i >= 0; i--) {
+		const stack = diffStack[i]
+		const firstNumber = stack[0]
+		if (i === deepest) {
+			stack.unshift(firstNumber)
+		} else {
+			const subStack = diffStack[i + 1]
+			stack.unshift(firstNumber - subStack[0])
+		}
+	}
+
+	return diffStack[0][0]
+}
+
+await answer(2, (input) => {
+	const sequences = input.map(asNumericList)
+	const backcasts = sequences.map(backcast)
+	return sum(backcasts)
+})
