@@ -59,30 +59,39 @@ function parseCountedCard(input: string): CountedCard {
 
 await answer(2, (input) => {
 	const cards = input.map(parseCountedCard)
+	const lastCardId = cards[cards.length - 1].id
 
-	// Process all cards backwards and store list of card IDs to be added
-	const winningsMap = new Map<number, number[]>()
-	for (let i = cards.length - 1; i >= 0; i--) {
-		const card = cards[i]
-		const newCardIds = cards
-			.slice(i + 1, i + 1 + card.matches)
-			.map(({ id }) => id)
-		winningsMap.set(card.id, newCardIds)
-	}
+	// Maps to quickly look up match and winnings values for cards
+	const matchesMap = cards.reduce((acc, card) => {
+		acc.set(card.id, card.matches)
+		return acc
+	}, new Map<number, number>())
+	const winningsMap = new Map<number, number>()
 
-	// Process card pool
-	const pool: number[] = cards.map((card) => card.id)
-	let processed = 0
+	// Recursive function to count winnings for a given card ID
+	const countWinnings = (cardId: number) => {
+		// End case
+		if (cardId === lastCardId) return 1
 
-	while (pool.length > 0) {
-		const cardId = pool.shift()
-		if (cardId) {
-			const newCards = winningsMap.get(cardId) ?? []
-			pool.push(...newCards)
-			processed++
+		// Check if already counted
+		if (winningsMap.has(cardId)) return winningsMap.get(cardId) ?? 1
+
+		// Count and store
+		const matches = matchesMap.get(cardId) ?? 0
+		const nextIds = cards.slice(cardId, cardId + matches).map((card) => card.id)
+
+		let winnings = 1
+		for (const nextId of nextIds) {
+			winnings += countWinnings(nextId)
 		}
+		winningsMap.set(cardId, winnings)
+		return winnings
 	}
 
-	// Return total number of processed cards
-	return processed
+	let totalWinnings = 0
+	for (const card of cards) {
+		totalWinnings += countWinnings(card.id)
+	}
+
+	return totalWinnings
 })
