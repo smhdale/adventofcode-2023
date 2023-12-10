@@ -1,5 +1,6 @@
 import { answer } from '../../lib/answer'
 import { groupInput } from '../../lib/input'
+import { lowestCommonMultiple } from '../../lib/math'
 
 /**
  * Part 1
@@ -56,70 +57,54 @@ function* createNavigator(directions: string): NodeNavigator {
 	}
 }
 
-function parseInput(input: string[]) {
+await answer(1, (input) => {
 	const [[directions], nodes] = groupInput(input)
 	const nav = createNavigator(directions)
 	const map = chartMap(nodes)
-	return { nav, map }
-}
 
-await answer(1, (input) => {
-	const { nav, map } = parseInput(input)
-
-	let step = 1
+	let step = 0
 	let node = map.get('AAA')
 
 	while (node) {
-		const dir = nav.next()
-		node = node.get(dir.value)
-		if (node?.id === 'ZZZ') return step
 		step++
+		const turn = nav.next().value
+		node = node.get(turn)
+		if (node?.id === 'ZZZ') break
 	}
+
+	return step
 })
 
 /**
  * Part 2
  */
 
-class Path {
-	private readonly map: NodeMap
-	private node: Node
-
-	constructor(map: NodeMap, startNodeId: string) {
-		this.map = map
-		const node = this.map.get(startNodeId)
-		if (!node) throw new Error(`Node ${startNodeId} not found`)
-		this.node = node
-	}
-
-	public get nodeId(): string {
-		return this.node.id
-	}
-
-	public step(direction: string) {
-		const node = this.node.get(direction)
-		if (!node) throw new Error(`Node ${this.nodeId} -> ${direction} not found`)
-		this.node = node
-	}
-
-	public atEndNode(): boolean {
-		return this.nodeId.endsWith('Z')
-	}
-}
-
-await answer(2, (input) => {
-	const { nav, map } = parseInput(input)
-
-	const paths = Array.from(map.keys())
-		.filter((key) => key.endsWith('A'))
-		.map((key) => new Path(map, key))
+function identifyCycle(
+	map: NodeMap,
+	directions: string,
+	start: string,
+): number {
+	const nav = createNavigator(directions)
 
 	let step = 0
-	while (paths.some((path) => !path.atEndNode())) {
-		const dir = nav.next()
-		for (const path of paths) path.step(dir.value)
+	let node = map.get(start)
+
+	while (node) {
 		step++
+		const turn = nav.next().value
+		node = node.get(turn)
+		if (node?.id.endsWith('Z')) break
 	}
 
 	return step
+}
+
+await answer(2, (input) => {
+	const [[directions], nodes] = groupInput(input)
+	const map = chartMap(nodes)
+
+	const starts = Array.from(map.keys()).filter((key) => key.endsWith('A'))
+	const cycles = starts.map((start) => identifyCycle(map, directions, start))
+
+	return cycles.reduce((acc, cycle) => lowestCommonMultiple(acc, cycle), 1)
 })
