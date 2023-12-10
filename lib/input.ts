@@ -38,3 +38,7 @@ export function groupInput(input: string[]): string[][] {
 
 	return groups
 }
+
+export function asNumericList(input: string): number[] {
+	return input.trim().split(/\s+/).map(Number)
+}

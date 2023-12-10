@@ -1,4 +1,5 @@
 import { answer } from '../../lib/answer'
+import { asNumericList } from '../../lib/input'
 
 /**
  * Part 1
@@ -10,14 +11,10 @@ type Scratchcard = {
 	cardNumbers: number[]
 }
 
-function parseNumbers(input: string): number[] {
-	return input.trim().split(/ +/).map(Number)
-}
-
 function parseCard(input: string): Scratchcard {
 	const [header, numbers] = input.split(': ')
 	const id = Number(header.replace('Card ', ''))
-	const [winningNumbers, cardNumbers] = numbers.split('|').map(parseNumbers)
+	const [winningNumbers, cardNumbers] = numbers.split('|').map(asNumericList)
 	return { id, winningNumbers, cardNumbers }
 }
 
