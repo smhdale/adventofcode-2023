@@ -1,19 +1,15 @@
 import { answer } from '../../lib/answer'
-import { eachPair } from '../../lib/combinations'
+import { listCombinations } from '../../lib/combinations'
 
 /**
  * Part 1
  */
 
-let id = 1
-
 class Galaxy {
-	public id: number
 	public x: number
 	public y: number
 
 	constructor(x: number, y: number) {
-		this.id = id++
 		this.x = x
 		this.y = y
 	}
@@ -25,7 +21,6 @@ class Galaxy {
 
 	public distanceTo(other: Galaxy) {
 		return Math.abs(other.x - this.x) + Math.abs(other.y - this.y)
-		// return Math.max(0, Math.abs(other.x - this.x) - 1) + Math.max(0, Math.abs(other.y - this.y) - 1)
 	}
 }
 
@@ -94,11 +89,12 @@ class Universe {
 await answer(1, (input, meta) => {
 	const universe = new Universe(input)
 	universe.expand(1)
+	const galaxyPairs = listCombinations(universe.galaxies, 2)
 
 	let totalDistance = 0
-	eachPair(universe.galaxies, (a, b) => {
+	for (const [a ,b] of galaxyPairs) {
 		totalDistance += a.distanceTo(b)
-	})
+	}
 	return totalDistance
 })
 
@@ -109,10 +105,11 @@ await answer(1, (input, meta) => {
 await answer(2, (input) => {
 	const universe = new Universe(input)
 	universe.expand(999999)
+	const galaxyPairs = listCombinations(universe.galaxies, 2)
 
 	let totalDistance = 0
-	eachPair(universe.galaxies, (a, b) => {
+	for (const [a ,b] of galaxyPairs) {
 		totalDistance += a.distanceTo(b)
-	})
+	}
 	return totalDistance
 })
