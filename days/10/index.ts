@@ -14,12 +14,14 @@ interface IPipe {
 	id: string
 	x: number
 	y: number
+	isCorner: boolean
 	traverse(from: string): string
 }
 
 interface IPlumbing {
 	start: Coord
 	pipes: Pipes
+	corners: Coord[]
 }
 
 type Pipes = Map<string, IPipe>
@@ -84,11 +86,13 @@ function createPipe(x: number, y: number, symbol: string): IPipe {
 		return to
 	}
 
-	return { id, x, y, traverse }
+	const isCorner = !['-', '|'].includes(symbol)
+	return { id, x, y, isCorner, traverse }
 }
 
 function parsePlumbing(input: string[]): IPlumbing {
 	const pipes = new Map<string, IPipe>()
+	const corners = []
 	let start: Coord | null = null
 
 	for (let y = 0; y < input.length; y++) {
@@ -101,16 +105,20 @@ function parsePlumbing(input: string[]): IPlumbing {
 					break
 				case 'S':
 					start = { x, y }
+					corners.push(start)
 					break
-				default:
-					pipes.set(xyToId(x, y), createPipe(x, y, symbol))
+				default: {
+					const pipe = createPipe(x, y, symbol)
+					pipes.set(xyToId(x, y), pipe)
+					if (pipe.isCorner) corners.push(pipe)
 					break
+				}
 			}
 		}
 	}
 
 	if (!start) throw new Error('Start tile not found')
-	return { start, pipes }
+	return { start, pipes, corners }
 }
 
 const START_DIRECTIONS: Coord[] = [
@@ -174,26 +182,7 @@ await answer(1, (input) => {
  * Part 2
  */
 
-/**
- * Naïve implementation of the shoelace formula
- * @see https://www.mathsisfun.com/geometry/area-irregular-polygons.html
- */
-function calculateAreaInside(poly: Coord[]): number {
-	const vertices = poly.length
-	let area = 0
 
-	for (let i = 0; i < vertices; i++) {
-		const u = poly[i]
-		const v = poly[(i + 1) % vertices]
-
-		const w = v.x - u.x
-		const h = (u.y + v.y) / 2
-
-		area += w * h
-	}
-
-	return Math.abs(area)
-}
 
 await answer(2, (input) => {
 	const { start, pipes } = parsePlumbing(input)
