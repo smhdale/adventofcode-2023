@@ -92,7 +92,7 @@ await answer(1, (input, meta) => {
 	const galaxyPairs = listCombinations(universe.galaxies, 2)
 
 	let totalDistance = 0
-	for (const [a ,b] of galaxyPairs) {
+	for (const [a, b] of galaxyPairs) {
 		totalDistance += a.distanceTo(b)
 	}
 	return totalDistance
@@ -108,7 +108,7 @@ await answer(2, (input) => {
 	const galaxyPairs = listCombinations(universe.galaxies, 2)
 
 	let totalDistance = 0
-	for (const [a ,b] of galaxyPairs) {
+	for (const [a, b] of galaxyPairs) {
 		totalDistance += a.distanceTo(b)
 	}
 	return totalDistance

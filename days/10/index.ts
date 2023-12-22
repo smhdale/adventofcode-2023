@@ -182,8 +182,6 @@ await answer(1, (input) => {
  * Part 2
  */
 
-
-
 await answer(2, (input) => {
 	const { start, pipes } = parsePlumbing(input)
 
@@ -193,7 +191,11 @@ await answer(2, (input) => {
 	for (const delta of START_DIRECTIONS) {
 		try {
 			const traversal = traversePipes(pipes, start, delta)
-			if (!bestTraversal || (traversal.isLoop && traversal.pipes.length > bestTraversal.pipes.length)) {
+			if (
+				!bestTraversal ||
+				(traversal.isLoop &&
+					traversal.pipes.length > bestTraversal.pipes.length)
+			) {
 				bestTraversal = traversal
 			}
 		} catch {

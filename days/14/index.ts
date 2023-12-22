@@ -52,8 +52,10 @@ class Platform {
 
 	private inBounds(coord: Coord): boolean {
 		return (
-			coord.x >= 0 && coord.x < this.width &&
-			coord.y >= 0 && coord.y < this.height
+			coord.x >= 0 &&
+			coord.x < this.width &&
+			coord.y >= 0 &&
+			coord.y < this.height
 		)
 	}
 
@@ -97,12 +99,7 @@ class Platform {
 	}
 
 	public spin(): void {
-		const cycle: Tilt[] = [
-			{ dy: -1 },
-			{ dx: -1 },
-			{ dy: 1 },
-			{ dx: 1 },
-		]
+		const cycle: Tilt[] = [{ dy: -1 }, { dx: -1 }, { dy: 1 }, { dx: 1 }]
 		for (const tilt of cycle) {
 			this.tilt(tilt)
 		}
@@ -117,7 +114,9 @@ class Platform {
 	}
 
 	public toString(): string {
-		const rows = Array.from({ length: this.height }).map(() => '.'.repeat(this.width).split(''))
+		const rows = Array.from({ length: this.height }).map(() =>
+			'.'.repeat(this.width).split(''),
+		)
 		for (const { x, y } of this.rocks.round) rows[y][x] = 'O'
 		for (const { x, y } of this.rocks.square) rows[y][x] = '#'
 		return rows.map((row) => row.join('')).join('\n')
@@ -144,7 +143,7 @@ await answer(2, (input) => {
 	for (let i = 0; i < cycles; i++) {
 		platform.spin()
 		if (i % logInterval === 0) {
-			console.log(`${(i / cycles * 100).toFixed(2)}% complete`)
+			console.log(`${((i / cycles) * 100).toFixed(2)}% complete`)
 		}
 	}
 	return platform.calculateNorthLoad()
